@@ -1,11 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-/* @import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-react-buttons/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-react-grids/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-react-navigations/styles/material.css";
 @import "../node_modules/@syncfusion/ej2-react-splitbuttons/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-dropdowns/styles/material.css"; */
+@import "../node_modules/@syncfusion/ej2-react-dropdowns/styles/material.css";
 @import "tailwindcss";
 
 @theme {
@@ -84,11 +84,18 @@ body {
   -webkit-backdrop-filter: blur(2px);
 }
 
+@layer base {
+  button {
+    cursor: pointer;
+  }
+}
+
 @layer components {
   .error {
     @apply text-red-500 text-base font-medium text-center;
   }
-  .all-users {
+
+  .users {
     @apply w-full min-h-screen  flex flex-col gap-10;
   }
 
@@ -110,6 +117,7 @@ body {
       @apply mt-9 mb-[30px] flex flex-col gap-3;
     }
   }
+
   .info-pill {
     @apply flex items-center gap-1.5;
 
@@ -310,13 +318,15 @@ body {
       }
     }
   }
+
   .link-logo {
     @apply flex items-center gap-1.5 py-10 border-b border-light-100;
 
-    h1 {
+    .h1 {
       @apply text-base md:text-2xl font-bold text-dark-100;
     }
   }
+
   .nav-footer {
     @apply flex items-center gap-2.5 pb-8;
 
@@ -336,6 +346,7 @@ body {
       }
     }
   }
+
   .mobile-sidebar {
     @apply lg:hidden flex flex-col gap-5;
     header {
@@ -350,6 +361,7 @@ body {
       }
     }
   }
+
   .root-nav {
     @apply flex justify-between gap-4  items-center;
     a {
@@ -367,6 +379,7 @@ body {
       }
     }
   }
+
   .footer-container {
     @apply flex justify-between items-center h-full gap-5;
     a {
@@ -385,6 +398,7 @@ body {
       }
     }
   }
+
   .header {
     @apply flex flex-col gap-5 md:flex-row justify-between w-full;
 
@@ -392,6 +406,7 @@ body {
       @apply flex flex-col gap-3.5 w-full;
     }
   }
+
   .nav-items {
     @apply flex flex-col px-6 h-full;
 
@@ -546,7 +561,7 @@ body {
   }
 }
 
-/* ======== CSS overrides for syncfusion ========= */
+/* ======== CSS overrides for Syncfusion ========= */
 .e-grid,
 .e-table {
   border-color: #eef9ff !important;
