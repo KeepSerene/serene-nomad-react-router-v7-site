@@ -83,11 +83,11 @@ declare interface TripCardProps {
   price: string;
 }
 
-declare interface StatsCard {
-  headerTitle: string;
+declare interface StatsCardProps {
+  title: string;
   total: number;
-  lastMonthCount: number;
   currentMonthCount: number;
+  lastMonthCount: number;
 }
 
 declare interface TrendResult {

@@ -1,5 +1,5 @@
 import { SidebarComponent } from "@syncfusion/ej2-react-navigations";
-import { MobileSidebar, SidebarNav } from "../../../components";
+import { MobileSidebar, SidebarNav } from "components";
 import { Outlet } from "react-router";
 
 function AdminLayout() {
@@ -14,10 +14,10 @@ function AdminLayout() {
         </SidebarComponent>
       </aside>
 
-      {/* Main: children */}
-      <main className="children">
+      {/* Children */}
+      <div className="children">
         <Outlet />
-      </main>
+      </div>
     </div>
   );
 }

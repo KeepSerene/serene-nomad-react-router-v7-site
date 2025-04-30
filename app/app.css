@@ -150,7 +150,7 @@ body {
       article {
         @apply flex flex-col gap-3.5 w-full items-center justify-center md:max-w-[488px];
 
-        h1 {
+        .h1 {
           @apply text-xl md:text-3xl font-semibold text-dark-100;
         }
 
@@ -191,6 +191,7 @@ body {
       }
     }
   }
+
   .travel-featured {
     @apply flex flex-col lg:flex-row gap-[30px] h-2/3 lg:h-1/2;
   }
@@ -352,7 +353,7 @@ body {
     header {
       @apply flex justify-between items-center border-b border-light-100;
 
-      h1 {
+      .h1 {
         @apply text-base md:text-2xl font-bold text-dark-100;
       }
 
@@ -367,10 +368,11 @@ body {
     a {
       @apply flex items-center gap-1.5 py-10;
 
-      h1 {
+      .h1 {
         @apply text-base md:text-2xl font-bold text-dark-100;
       }
     }
+
     aside {
       @apply flex gap-4 items-center;
 
@@ -385,7 +387,7 @@ body {
     a {
       @apply flex items-center gap-1.5 py-10;
 
-      h1 {
+      .h1 {
         @apply text-base md:text-2xl font-bold text-dark-100;
       }
     }
@@ -402,7 +404,7 @@ body {
   .header {
     @apply flex flex-col gap-5 md:flex-row justify-between w-full;
 
-    article {
+    .article {
       @apply flex flex-col gap-3.5 w-full;
     }
   }
@@ -441,11 +443,12 @@ body {
     .container {
       @apply flex flex-col gap-5 mt-2.5;
 
-      h1 {
+      .h1 {
         @apply text-xl font-semibold text-dark-100;
       }
     }
   }
+
   .featured-card {
     @apply flex flex-col justify-between gap-3.5 p-[30px] min-h-[230px] h-full;
   }

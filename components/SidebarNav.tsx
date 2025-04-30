@@ -2,7 +2,7 @@ import { cn } from "lib/utils";
 import { Link, NavLink } from "react-router";
 import { sidebarItems } from "~/constants";
 
-function SidebarNav() {
+function SidebarNav({ handleClick }: { handleClick?: () => void }) {
   const user = {
     name: "Dhruv",
     email: "dhruv@pro.com",
@@ -28,6 +28,7 @@ function SidebarNav() {
               <NavLink to={href}>
                 {({ isActive }: { isActive: boolean }) => (
                   <span
+                    onClick={handleClick}
                     className={cn(
                       "group nav-item",
                       isActive ? "bg-primary-100 !text-white" : ""
