@@ -1,69 +1,10 @@
+import { dashboardStats, trips, user } from "~/constants";
 import { Header, StatsCard, TripCard } from "components";
 
+const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } =
+  dashboardStats;
+
 function Dashboard() {
-  // Dummy data
-  const user = { name: "Dhruv" };
-
-  const dashboardStats = {
-    totalUsers: 12450,
-    usersJoined: {
-      currentMonth: 218,
-      lastMonth: 176,
-    },
-    totalTrips: 3210,
-    tripsCreated: {
-      currentMonth: 150,
-      lastMonth: 250,
-    },
-    userRole: {
-      total: 62,
-      currentMonth: 25,
-      lastMonth: 15,
-    },
-  };
-
-  const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } =
-    dashboardStats;
-
-  const trips = [
-    {
-      id: 1,
-      name: "Tropical Rewind",
-      imageUrls: ["/assets/images/sample1.jpg"],
-      itinerary: [{ location: "Thailand" }],
-      tags: ["Adventure", "Culture"],
-      travelStyle: "Solo",
-      estimatedPrice: "$1,000",
-    },
-    {
-      id: 2,
-      name: "French Reverie",
-      imageUrls: ["/assets/images/sample2.jpg"],
-      itinerary: [{ location: "Paris" }],
-      tags: ["Relaxation", "Culinary"],
-      travelStyle: "Family",
-      estimatedPrice: "$2,000",
-    },
-    {
-      id: 3,
-      name: "Zen Break",
-      imageUrls: ["/assets/images/sample3.jpg"],
-      itinerary: [{ location: "Japan" }],
-      tags: ["Shopping", "Luxury"],
-      travelStyle: "Couple",
-      estimatedPrice: "$3,000",
-    },
-    {
-      id: 4,
-      name: "Adventure in Westeros",
-      imageUrls: ["/assets/images/sample4.jpg"],
-      itinerary: [{ location: "Croatia" }],
-      tags: ["Historical", "Culture"],
-      travelStyle: "Friends",
-      estimatedPrice: "$4,000",
-    },
-  ];
-
   return (
     <main className="dashboard wrapper">
       <Header
@@ -71,8 +12,10 @@ function Dashboard() {
         desc="Track activity, trends, and popular destinations in real time"
       />
 
+      {/* Stats cards */}
       <div className="flex flex-col gap-6">
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total users */}
           <StatsCard
             title="Total users"
             total={totalUsers}
@@ -80,6 +23,7 @@ function Dashboard() {
             lastMonthCount={usersJoined.lastMonth}
           />
 
+          {/* Total trips */}
           <StatsCard
             title="Total trips"
             total={totalTrips}
@@ -87,6 +31,7 @@ function Dashboard() {
             lastMonthCount={tripsCreated.lastMonth}
           />
 
+          {/* Active users */}
           <StatsCard
             title="Active users today"
             total={userRole.total}
@@ -94,9 +39,30 @@ function Dashboard() {
             lastMonthCount={userRole.lastMonth}
           />
         </div>
-
-        <TripCard />
       </div>
+
+      {/* Trip cards */}
+      <section className="container">
+        <h2 className="text-dark-100 text-xl font-semibold capitalize">
+          Created trips
+        </h2>
+
+        <div className="trip-grid">
+          {trips
+            .slice(0, 4)
+            .map(({ id, name, imageUrls, itinerary, tags, estimatedPrice }) => (
+              <TripCard
+                key={id}
+                id={id.toString()}
+                name={name}
+                location={itinerary?.[0]?.location ?? ""}
+                imageUrl={imageUrls?.[0] ?? ""}
+                tags={tags}
+                price={estimatedPrice}
+              />
+            ))}
+        </div>
+      </section>
     </main>
   );
 }

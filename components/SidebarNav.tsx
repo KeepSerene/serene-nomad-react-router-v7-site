@@ -1,14 +1,8 @@
 import { cn } from "lib/utils";
 import { Link, NavLink } from "react-router";
-import { sidebarItems } from "~/constants";
+import { sidebarItems, user } from "~/constants";
 
 function SidebarNav({ handleClick }: { handleClick?: () => void }) {
-  const user = {
-    name: "Dhruv",
-    email: "dhruv@pro.com",
-    imgUrl: "/assets/images/david.webp",
-  };
-
   return (
     <nav className="nav-items">
       <Link to="/" className="link-logo">

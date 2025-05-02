@@ -19,7 +19,9 @@ function StatsCard({
 
       <div className="content">
         <section className="flex flex-col gap-4">
-          <h2 className="text-4xl font-semibold">{total}</h2>
+          <h2 className="text-4xl font-semibold">
+            {new Intl.NumberFormat().format(total)}
+          </h2>
 
           <div className="flex items-center gap-2">
             <figure className="flex items-center gap-1">
