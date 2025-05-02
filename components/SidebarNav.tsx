@@ -1,8 +1,17 @@
 import { cn } from "lib/utils";
-import { Link, NavLink } from "react-router";
-import { sidebarItems, user } from "~/constants";
+import { Link, NavLink, useLoaderData, useNavigate } from "react-router";
+import { logOutUser } from "~/appwrite/auth";
+import { sidebarItems } from "~/constants";
 
 function SidebarNav({ handleClick }: { handleClick?: () => void }) {
+  const user = useLoaderData();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logOutUser();
+    navigate("/sign-in");
+  };
+
   return (
     <nav className="nav-items">
       <Link to="/" className="link-logo">
@@ -47,8 +56,9 @@ function SidebarNav({ handleClick }: { handleClick?: () => void }) {
 
         <footer className="nav-footer">
           <img
-            src={user?.imgUrl ?? "/assets/images/david.webp"}
+            src={user?.imageUrl ?? "/assets/images/david.webp"}
             alt={user?.name ?? "User"}
+            referrerPolicy="no-referrer"
           />
 
           <article>
@@ -57,13 +67,7 @@ function SidebarNav({ handleClick }: { handleClick?: () => void }) {
             <p>{user?.email ?? "example@email.com"}</p>
           </article>
 
-          <button
-            type="button"
-            onClick={() => {
-              console.log("Log out!");
-            }}
-            aria-label="Log out"
-          >
+          <button type="button" onClick={handleLogout} aria-label="Log out">
             <img
               src={"/assets/icons/logout.svg"}
               alt="Log out icon"

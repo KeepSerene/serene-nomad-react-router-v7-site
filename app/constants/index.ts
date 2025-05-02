@@ -145,7 +145,7 @@ export const RIGHT_CONFETTI = {
 export const user = {
   name: "Dhruv",
   email: "dhruv@pro.com",
-  imgUrl: "/assets/images/david.webp",
+  imageUrl: "/assets/images/david.webp",
 };
 
 export const dashboardStats = {

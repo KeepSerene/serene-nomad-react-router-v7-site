@@ -23,7 +23,7 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-// Register Syncfusion Essential Studio® 7-Day License Key
+// Register Syncfusion Essential Studio® Community License Key
 registerLicense(import.meta.env.VITE_SYNCFUSION_LICENSE_KEY);
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -33,6 +33,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
+
+        <link
+          rel="icon"
+          href="/assets/icons/logo.svg"
+          sizes="any"
+          type="image/svg+xml"
+        />
         <Links />
         <title>SereneNomad | Welcome</title>
       </head>

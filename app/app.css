@@ -81,7 +81,6 @@ body {
 .glassmorphism {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 
 @layer base {
@@ -108,13 +107,14 @@ body {
   }
 
   .sign-in-card {
-    @apply flex bg-white flex-col border border-light-100 md:max-w-[510px] rounded-[20px] py-10 px-6 w-full;
+    @apply flex bg-white flex-col border border-light-100 md:max-w-[510px] rounded-[20px] px-6 py-8 w-full;
 
-    header {
+    .header {
       @apply flex items-center gap-1.5 justify-center;
     }
-    article {
-      @apply mt-9 mb-[30px] flex flex-col gap-3;
+
+    .article {
+      @apply mt-9 flex flex-col gap-4;
     }
   }
 
@@ -524,7 +524,8 @@ body {
   }
 
   .button-class {
-    @apply !bg-primary-100 !px-4 !rounded-lg !flex !items-center !justify-center !gap-1.5 !shadow-none;
+    @apply !bg-primary-100 !text-white !px-4 !rounded-lg !flex !items-center !justify-center !gap-1.5 !shadow-none;
+    @apply !transition-colors !duration-200 hover:!bg-primary-500 focus-visible:!bg-primary-500;
   }
 
   .button-class-secondary {
