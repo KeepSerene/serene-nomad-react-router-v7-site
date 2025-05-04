@@ -120,3 +120,21 @@ export const logOutUser = async () => {
     return false;
   }
 };
+
+export const fetchAllUsers = async (limit: number, offset: number) => {
+  try {
+    const { documents, total } = await database.listDocuments(
+      appwriteConfig.dbId,
+      appwriteConfig.usersCollectionId,
+      [Query.limit(limit), Query.offset(offset)]
+    );
+
+    if (total === 0) return { users: [], total };
+
+    return { users: documents, total };
+  } catch (err) {
+    console.error("Error fetching users", err);
+
+    return { users: [], total: 0 };
+  }
+};
