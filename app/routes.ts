@@ -9,4 +9,5 @@ export default [
     route("trips/create", "./routes/admin/create-trip.tsx"),
     route("trips", "./routes/admin/trips.tsx"),
   ]),
+  route("trips/create", "./routes/api/create-trip.ts"),
 ] satisfies RouteConfig;
