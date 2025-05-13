@@ -11,6 +11,7 @@ export default [
     route("users", "./routes/admin/users.tsx"),
     route("trips/create", "./routes/admin/create-trip.tsx"),
     route("trips", "./routes/admin/trips.tsx"),
+    route("trips/:tripId", "./routes/admin/trip-detail.tsx"),
   ]),
 
   // API route

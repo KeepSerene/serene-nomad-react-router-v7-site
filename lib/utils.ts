@@ -33,6 +33,7 @@ export function parseTripData(jsonString: string): Trip | null {
     return data;
   } catch (error) {
     console.error("Failed to parse trip data:", error);
+
     return null;
   }
 }
