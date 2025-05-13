@@ -4,7 +4,8 @@ import { parseMarkdownToJSON } from "lib/utils";
 import { appwriteConfig, database } from "~/appwrite/client";
 import { ID } from "appwrite";
 
-export async function createTripAction({ request }: ActionFunctionArgs) {
+// Create trip action function
+export async function action({ request }: ActionFunctionArgs) {
   const {
     userId,
     country,
@@ -16,7 +17,7 @@ export async function createTripAction({ request }: ActionFunctionArgs) {
   } = await request.json();
 
   const googleGenAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-  const unsplashAccessAPIKey = process.env.UNSPLASH_ACCESS_KEY!;
+  const unsplashAccessKey = process.env.UNSPLASH_ACCESS_KEY!;
 
   try {
     const prompt = `Generate a ${duration}-day travel itinerary for ${country} based on the following user information:
@@ -73,7 +74,7 @@ export async function createTripAction({ request }: ActionFunctionArgs) {
     const trip = parseMarkdownToJSON(textResult.response.text());
 
     const imageResponse = await fetch(
-      `https://api.unsplash.com/search/photos?query=${country} ${interest} ${travelStyle}&client_id=${unsplashAccessAPIKey}`
+      `https://api.unsplash.com/search/photos?query=${country} ${interest} ${travelStyle}&client_id=${unsplashAccessKey}`
     );
 
     const imageUrls = (await imageResponse.json()).results

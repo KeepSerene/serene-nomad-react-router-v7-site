@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import { useState } from "react";
 import type { Route } from "./+types/create-trip";
 import { Header } from "components";
@@ -42,6 +43,8 @@ export async function loader() {
 }
 
 function CreateTrip({ loaderData }: Route.ComponentProps) {
+  const navigate = useNavigate();
+
   const countries = loaderData as Country[];
 
   const [formData, setFormData] = useState<TripFormData>({
@@ -116,9 +119,29 @@ function CreateTrip({ loaderData }: Route.ComponentProps) {
     }
 
     try {
-      console.log("User", user);
+      const response = await fetch("/api/create-trip", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.$id,
+          country: formData.country,
+          interest: formData.interest,
+          groupType: formData.groupType,
+          budget: formData.budget,
+          travelStyle: formData.travelStyle,
+          duration: formData.duration,
+        }),
+      });
 
-      console.log("Form data:", formData);
+      const result: CreateTripResponse = await response.json();
+
+      if (result?.id) {
+        navigate(`/trips/${result.id}`);
+      } else {
+        console.error("Failed to generate a trip!");
+      }
     } catch (err) {
       if (err instanceof Error) {
         setErrMsg(err.message);
