@@ -1,16 +1,108 @@
-import { fetchUserDetail } from "~/appwrite/auth";
-import { dashboardStats, trips } from "~/constants";
+import { fetchAllUsers, fetchUserDetail } from "~/appwrite/auth";
+import {
+  fetchUserAndTripStats,
+  getTripsByTravelStyle,
+  getTripsCreatedPerDay,
+  getUserGrowthPerDay,
+} from "~/appwrite/dashboard";
 import type { Route } from "./+types/dashboard";
 import { Header, StatsCard, TripCard } from "components";
+import { fetchAllTrips } from "~/appwrite/trips";
+import { parseTripData } from "lib/utils";
+import {
+  Category,
+  ChartComponent,
+  ColumnSeries,
+  DataLabel,
+  Inject,
+  SeriesCollectionDirective,
+  SeriesDirective,
+  SplineAreaSeries,
+  Tooltip,
+} from "@syncfusion/ej2-react-charts";
+import { tripXAxis, tripYAxis, userXAxis, userYAxis } from "~/constants";
+import {
+  ColumnDirective,
+  ColumnsDirective,
+  GridComponent,
+} from "@syncfusion/ej2-react-grids";
 
-// Route loader
-export const clientLoader = async () => await fetchUserDetail();
+// Route loader (client)
+export async function clientLoader() {
+  try {
+    const [
+      user,
+      dashboardStats,
+      trips,
+      allUsers,
+      userGrowth,
+      tripsPerDay,
+      tripsByTravelStyle,
+    ] = await Promise.all([
+      fetchUserDetail(),
+      fetchUserAndTripStats(),
+      fetchAllTrips(4, 0),
+      fetchAllUsers(4, 0),
+      getUserGrowthPerDay(),
+      getTripsCreatedPerDay(),
+      getTripsByTravelStyle(),
+    ]);
 
-const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } =
-  dashboardStats;
+    const allTrips = trips.allTrips.map(({ $id, tripDetail, imageUrls }) => ({
+      id: $id,
+      ...parseTripData(tripDetail),
+      imageUrls: imageUrls || [],
+    }));
+
+    const mappedUsers: UsersItineraryCount[] = allUsers.users.map((user) => ({
+      name: user.name,
+      imageUrl: user.imageUrl,
+      count: user.itineraryCount ?? Math.trunc(Math.random() * 10),
+    }));
+
+    return {
+      user,
+      dashboardStats,
+      allTrips,
+      mappedUsers,
+      userGrowth,
+      tripsPerDay,
+      tripsByTravelStyle,
+    };
+  } catch (err) {
+    console.error("Error fetching dashboard data:", err);
+  }
+}
 
 function Dashboard({ loaderData }: Route.ComponentProps) {
-  const user = loaderData as User | null;
+  const user = loaderData?.user as User | null;
+  const dashboardStats = loaderData?.dashboardStats as DashboardStats | null;
+  const allTrips = loaderData?.allTrips;
+  const users = loaderData?.mappedUsers;
+  const userGrowth = loaderData?.userGrowth;
+  // const tripsPerDay = loaderData?.tripsPerDay;
+  const tripsByTravelStyle = loaderData?.tripsByTravelStyle;
+
+  const trips = allTrips?.map((trip) => ({
+    name: trip.name,
+    imageUrl: trip.imageUrls[0],
+    interest: trip.interests,
+  }));
+
+  const userAndTrips = [
+    {
+      title: "Latest user signups",
+      dataSource: users,
+      field: "count",
+      headerText: "Trips created",
+    },
+    {
+      title: "Trips based on interests",
+      dataSource: trips,
+      field: "interest",
+      headerText: "Interests",
+    },
+  ];
 
   return (
     <main className="dashboard wrapper">
@@ -25,25 +117,25 @@ function Dashboard({ loaderData }: Route.ComponentProps) {
           {/* Total users */}
           <StatsCard
             title="Total users"
-            total={totalUsers}
-            currentMonthCount={usersJoined.currentMonth}
-            lastMonthCount={usersJoined.lastMonth}
+            total={dashboardStats?.totalUsers ?? 0}
+            currentMonthCount={dashboardStats?.usersJoined.currentMonth ?? 0}
+            lastMonthCount={dashboardStats?.usersJoined.lastMonth ?? 0}
           />
 
           {/* Total trips */}
           <StatsCard
             title="Total trips"
-            total={totalTrips}
-            currentMonthCount={tripsCreated.currentMonth}
-            lastMonthCount={tripsCreated.lastMonth}
+            total={dashboardStats?.totalTrips ?? 0}
+            currentMonthCount={dashboardStats?.tripsCreated.currentMonth ?? 0}
+            lastMonthCount={dashboardStats?.tripsCreated.lastMonth ?? 0}
           />
 
           {/* Active users */}
           <StatsCard
             title="Active users today"
-            total={userRole.total}
-            currentMonthCount={userRole.currentMonth}
-            lastMonthCount={userRole.lastMonth}
+            total={dashboardStats?.userRole.total ?? 0}
+            currentMonthCount={dashboardStats?.userRole.currentMonth ?? 0}
+            lastMonthCount={dashboardStats?.userRole.lastMonth ?? 0}
           />
         </div>
       </div>
@@ -54,22 +146,143 @@ function Dashboard({ loaderData }: Route.ComponentProps) {
           Created trips
         </h2>
 
-        <div className="trip-grid">
-          {trips
-            .slice(0, 4)
-            .map(({ id, name, imageUrls, itinerary, tags, estimatedPrice }) => (
-              <TripCard
-                key={id}
-                id={id.toString()}
-                name={name}
-                location={itinerary?.[0]?.location ?? ""}
-                imageUrl={imageUrls?.[0] ?? ""}
-                tags={tags}
-                price={estimatedPrice}
-              />
-            ))}
-        </div>
+        {allTrips && allTrips.length > 0 && (
+          <div className="trip-grid">
+            {allTrips.map(
+              ({
+                id,
+                name,
+                imageUrls,
+                itinerary,
+                interests,
+                travelStyle,
+                estimatedPrice,
+              }) => (
+                <TripCard
+                  key={id}
+                  id={id.toString()}
+                  name={name ?? ""}
+                  location={itinerary?.[0]?.location ?? ""}
+                  imageUrl={imageUrls?.[0] ?? ""}
+                  tags={[interests ?? "", travelStyle ?? ""]}
+                  price={estimatedPrice ?? ""}
+                />
+              )
+            )}
+          </div>
+        )}
       </section>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <ChartComponent
+          id="chart-1"
+          primaryXAxis={userXAxis}
+          primaryYAxis={userYAxis}
+          title="User Growth"
+          tooltip={{ enable: true }}
+        >
+          <Inject
+            services={[
+              ColumnSeries,
+              SplineAreaSeries,
+              Category,
+              DataLabel,
+              Tooltip,
+            ]}
+          />
+
+          <SeriesCollectionDirective>
+            <SeriesDirective
+              dataSource={userGrowth}
+              xName="day"
+              yName="count"
+              type="Column"
+              name="Column"
+              columnWidth={0.3}
+              cornerRadius={{ topLeft: 10, topRight: 10 }}
+            />
+
+            <SeriesDirective
+              dataSource={userGrowth}
+              xName="day"
+              yName="count"
+              type="SplineArea"
+              name="Wave"
+              fill="rgba(71, 132, 238, 0.3)"
+              border={{ width: 2, color: "#4784ee" }}
+            />
+          </SeriesCollectionDirective>
+        </ChartComponent>
+
+        <ChartComponent
+          id="chart-2"
+          primaryXAxis={tripXAxis}
+          primaryYAxis={tripYAxis}
+          title="Trip Trends"
+          tooltip={{ enable: true }}
+        >
+          <Inject
+            services={[
+              ColumnSeries,
+              SplineAreaSeries,
+              Category,
+              DataLabel,
+              Tooltip,
+            ]}
+          />
+
+          <SeriesCollectionDirective>
+            <SeriesDirective
+              dataSource={tripsByTravelStyle}
+              xName="travelStyle"
+              yName="count"
+              type="Column"
+              name="Day"
+              columnWidth={0.3}
+              cornerRadius={{ topLeft: 10, topRight: 10 }}
+            />
+          </SeriesCollectionDirective>
+        </ChartComponent>
+      </div>
+
+      <div className="user-trip wrapper">
+        {userAndTrips.map(({ title, dataSource, field, headerText }, index) => (
+          <section key={index} className="flex flex-col gap-5">
+            <h3 className="text-dark-100 p-20-semibold">{title}</h3>
+
+            <GridComponent dataSource={dataSource} gridLines="None">
+              <ColumnsDirective>
+                <ColumnDirective
+                  field="name"
+                  headerText="Name"
+                  width={200}
+                  textAlign="Left"
+                  template={(props: UserData) => (
+                    <div className="px-4 flex items-center gap-1.5">
+                      <img
+                        src={props.imageUrl}
+                        alt={props.name}
+                        referrerPolicy="no-referrer"
+                        className="aspect-square size-8 rounded-full"
+                      />
+
+                      <span>{props.name}</span>
+                    </div>
+                  )}
+                />
+
+                <ColumnDirective
+                  field={field}
+                  headerText={headerText}
+                  width={150}
+                  textAlign="Left"
+                />
+              </ColumnsDirective>
+            </GridComponent>
+          </section>
+        ))}
+      </div>
     </main>
   );
 }

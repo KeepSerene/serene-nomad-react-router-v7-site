@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { fetchTripById } from "~/appwrite/trips";
+import { fetchAllTrips, fetchTripById } from "~/appwrite/trips";
 import type { Route } from "./+types/trip-detail";
 import { cn, parseTripData } from "lib/utils";
-import { Header, InfoPill } from "components";
+import { Header, InfoPill, TripCard } from "components";
 import {
   ChipDirective,
   ChipListComponent,
@@ -14,13 +14,26 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   if (!tripId) throw new Error("Trip ID is required!");
 
-  return await fetchTripById(tripId);
+  try {
+    return await Promise.all([fetchTripById(tripId), fetchAllTrips(4, 0)]);
+  } catch (err) {
+    console.error("Error fetching trip data:", err);
+  }
 }
 
 function TripDetail({ loaderData }: Route.ComponentProps) {
-  const tripData = parseTripData(loaderData?.tripDetail);
-  console.log(tripData);
-  const imageUrls = loaderData?.imageUrls ?? [];
+  // Single trip
+  const tripData = parseTripData(loaderData?.[0]?.tripDetail);
+  const imageUrls = (loaderData?.[0]?.imageUrls ?? []) as string[] | [];
+
+  // Multiple trips
+  const allTrips = loaderData?.[1]?.allTrips.map(
+    ({ $id, tripDetail, imageUrls }) => ({
+      id: $id,
+      ...parseTripData(tripDetail),
+      imageUrls: imageUrls ?? [],
+    })
+  );
 
   const {
     country,
@@ -34,13 +47,25 @@ function TripDetail({ loaderData }: Route.ComponentProps) {
     groupType,
     travelStyle,
     weatherInfo,
+    description,
   } = tripData ?? {};
 
   const chipItems = [
-    { text: travelStyle, bg: "!bg-pink-50 !text-pink-500" },
-    { text: groupType, bg: "!bg-primary-50 !text-primary-500" },
-    { text: budget, bg: "!bg-success-50 !text-success-700" },
-    { text: interests, bg: "!bg-navy-50 !text-navy-500" },
+    { text: travelStyle, classStr: "!bg-pink-50 !text-pink-500" },
+    { text: groupType, classStr: "!bg-primary-50 !text-primary-500" },
+    { text: budget, classStr: "!bg-success-50 !text-success-700" },
+    { text: interests, classStr: "!bg-navy-50 !text-navy-500" },
+  ];
+
+  const visitTimeAndWeatherInfo = [
+    {
+      title: "Best Time to Visit:",
+      items: bestTimeToVisit,
+    },
+    {
+      title: "Weather:",
+      items: weatherInfo,
+    },
   ];
 
   return (
@@ -50,8 +75,8 @@ function TripDetail({ loaderData }: Route.ComponentProps) {
         desc="View and edit AI-generated travel plans"
       />
 
-      <section className="container wrapper-md">
-        <div className="header">
+      <article className="container wrapper-md">
+        <section className="header">
           <h1 className="p-40-semibold text-dark-100">{name}</h1>
 
           <div className="flex items-center gap-5">
@@ -63,14 +88,14 @@ function TripDetail({ loaderData }: Route.ComponentProps) {
             <InfoPill
               text={
                 itinerary
-                  ?.slice(0, 2)
+                  ?.slice(0, 4)
                   .map((item) => item.location)
                   .join(", ") ?? ""
               }
               image="/assets/icons/location-mark.svg"
             />
           </div>
-        </div>
+        </section>
 
         <ul className="gallery">
           {imageUrls.map((url: string, index: number) => (
@@ -99,7 +124,7 @@ function TripDetail({ loaderData }: Route.ComponentProps) {
                 <ChipDirective
                   key={index}
                   text={chip.text}
-                  cssClass={cn(chip.bg, "!text-base !font-medium !px-4")}
+                  cssClass={cn(chip.classStr, "!text-base !font-medium !px-4")}
                 />
               ))}
             </ChipsDirective>
@@ -130,6 +155,99 @@ function TripDetail({ loaderData }: Route.ComponentProps) {
             </li>
           </ul>
         </div>
+
+        <section className="title">
+          <div className="article">
+            <h2>
+              {duration}-Day {country} {travelStyle} Trip
+            </h2>
+
+            <p>
+              {budget}, {groupType}, and {interests}
+            </p>
+          </div>
+
+          <span className="h2">{estimatedPrice}</span>
+        </section>
+
+        <p className="text-dark-400 text-sm md:text-lg font-normal">
+          {description}
+        </p>
+
+        <>
+          {itinerary && itinerary.length > 0 && (
+            <ul className="itinerary">
+              {itinerary.map((dayPlan: DayPlan, index) => (
+                <li key={index}>
+                  <h3>
+                    Day {dayPlan.day}: {dayPlan.location}
+                  </h3>
+
+                  <ul>
+                    {dayPlan.activities.map((activity, index) => (
+                      <li key={index}>
+                        <span className="flex-shrink-0 p-18-semibold">
+                          {activity.time}
+                        </span>
+
+                        <p className="flex-grow">{activity.description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+
+        <>
+          {visitTimeAndWeatherInfo.map((section) => (
+            <section key={section.title} className="visit">
+              <div>
+                <h2>{section.title}</h2>
+
+                {section.items && section.items.length > 0 && (
+                  <ul>
+                    {section.items.map((item) => (
+                      <li key={item} className="flex-grow">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          ))}
+        </>
+      </article>
+
+      <section className="flex flex-col gap-6">
+        <h2 className="p-24-semibold text-dark-100">Popular Trips</h2>
+
+        <ul className="trip-grid">
+          {allTrips?.map(
+            ({
+              id,
+              name,
+              imageUrls,
+              travelStyle,
+              interests,
+              itinerary,
+              estimatedPrice,
+            }) => (
+              <li key={id}>
+                <TripCard
+                  id={id}
+                  name={name ?? ""}
+                  imageUrl={imageUrls[0]}
+                  location={itinerary?.[0].location ?? ""}
+                  tags={[travelStyle ?? "", interests ?? ""]}
+                  price={estimatedPrice ?? ""}
+                />
+              </li>
+            )
+          )}
+        </ul>
       </section>
     </main>
   );

@@ -237,7 +237,7 @@ body {
       div {
         @apply flex flex-col gap-4;
 
-        h3 {
+        h2 {
           @apply text-base md:text-xl text-dark-400 font-semibold;
         }
 
@@ -276,12 +276,12 @@ body {
     }
 
     .title {
-      @apply flex justify-between gap-5;
+      @apply flex justify-between items-baseline gap-5;
 
-      article {
+      .article {
         @apply flex flex-col gap-4;
 
-        h3 {
+        h2 {
           @apply text-xl md:text-3xl text-dark-100 font-semibold;
         }
 
@@ -290,7 +290,7 @@ body {
         }
       }
 
-      h2 {
+      .h2 {
         @apply text-sm md:text-xl font-normal text-dark-100;
       }
     }

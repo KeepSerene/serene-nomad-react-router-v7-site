@@ -21,7 +21,7 @@ function TripCard({
     if (pathname === "/" || pathname.startsWith("/travel")) {
       navigate(`/travel/${id}`);
     } else {
-      navigate(`trips/${id}`);
+      navigate(`/trips/${id}`);
     }
   };
 
@@ -38,7 +38,7 @@ function TripCard({
 
         <figure>
           <img
-            src="assets/icons/location-mark.svg"
+            src="/assets/icons/location-mark.svg"
             alt="Location mark icon"
             className="size-4"
           />
